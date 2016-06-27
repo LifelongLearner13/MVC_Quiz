@@ -2,7 +2,7 @@
 
 var Model = function () {
   this.questions = [{
-    text: '<:48:x<:65:=<:6C:$=$=$$~<:03:+$~<:ffffffffffffffbd:+$<:ffffffffffffffb1:+$<:57:~$~<:18:x+$~<:03:+$~<:06:x-$x<:0e:x-$=x<:43:x-$',
+    text: 'Question 1',
     answers: [
       '0815',
       '2B',
@@ -11,7 +11,7 @@ var Model = function () {
     ],
     correct: 0
   }, {
-    text: '+0+0+0+0+0+0+0+2)+0+0+9)+7))+3)-0-0-0-0-0-0-0-9)+0+0+0+0+0+0+0+0+7)-8)+3)-6)-8)-7-0-0-0-0-0-0)',
+    text: 'Question 2',
     answers: [
       '0815',
       '2B',
@@ -20,7 +20,7 @@ var Model = function () {
     ],
     correct: 1
   }, {
-    text: '*6*3p*4*3*2*0p*2*1*0pp>0*1*0p*5*4*0p*5*4*2*1*0p*4*3p*1*0p/+0p+0*6*5*2p+0*5*0p',
+    text: 'Question 3',
     answers: [
       '0815',
       '2B',
@@ -29,7 +29,7 @@ var Model = function () {
     ],
     correct: 2
   }, {
-    text: ']xhhhhooooooooohhhhhhxooooooooxooooooxjjjxhoooohhhxhohhhhhhhxhhhhjjjhhhxhhhhooooooooohhhhhhxjjjxxjjjjjjjxjhhhhxjhhhhhhhhjjjhh~',
+    text: 'Question 4',
     answers: [
       '0815',
       '2B',
@@ -53,11 +53,13 @@ Model.prototype.checkQuestion = function (input) {
     this.score++;
   }
   if (++this.currentQuestion === this.questions.length) {
+    // TODO: need to handle edge case when we run out of questions - or maybe move this
     console.log('game over');
   }
 };
 
 Model.prototype.getScore = function () {
+  // TODO: implement how score count is displayed in view
   console.log(this.score);
 };
 
@@ -68,8 +70,6 @@ Model.prototype.getQuestion = function () {
     answers: this.questions[this.currentQuestion].answers
   };
 };
-
-var model = new Model();
 
 /*------------ VIEW ------------*/
 
@@ -101,6 +101,7 @@ QuestionView.prototype.hideQuestions = function () {
   this.questionsPageElement.hide();
 };
 
+// TODO: page shows 3/0, need to show the total number of questions
 QuestionView.prototype.setQuestion = function (questionObj) {
   this.questionCurrentElement.text(questionObj.questionNum);
   this.questionElement.text(questionObj.text);
@@ -113,7 +114,8 @@ QuestionView.prototype.setQuestion = function (questionObj) {
   }
 };
 
-
+// TODO: find all the binds and bind them
+// TODO: somehow we have to switch views...
 
 var ResultView = function () {
   this.resultsPageElement = $('.results-page');
@@ -131,7 +133,7 @@ ResultView.prototype.hideResults = function () {
 
 /*------------ CONTROLLER ------------*/
 
-var Controller = function(model, questionView, resultView) {
+var Controller = function (model, questionView, resultView) {
   this.model = model;
   this.questionView = questionView;
   this.resultView = resultView;
@@ -139,7 +141,7 @@ var Controller = function(model, questionView, resultView) {
   this.questionView.onChange = this.onAnswerSubmitted.bind(this);
 };
 
-Controller.prototype.onAnswerSubmitted = function(userChoice) {
+Controller.prototype.onAnswerSubmitted = function (userChoice) {
   console.log('in Controller.prototype.onAnswerSubmitted');
   this.model.checkQuestion(userChoice);
   this.questionView.setQuestion(this.model.getQuestion());
@@ -203,6 +205,8 @@ restartButtonElement.click(function () {
 });
 
 */
+
+// TODO: restart button - in the result view most likely
 
 $(document).ready(function () {
   //  questionsTotalElement.text(QUESTIONS.length); // view
