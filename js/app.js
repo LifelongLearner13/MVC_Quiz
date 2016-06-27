@@ -63,7 +63,7 @@ Model.prototype.getScore = function () {
 
 Model.prototype.getQuestion = function () {
   return {
-    questionNum: currentQuestion,
+    questionNum: this.currentQuestion,
     text: this.questions[this.currentQuestion].text,
     answers: this.questions[this.currentQuestion].answers
   };
@@ -87,7 +87,7 @@ var QuestionView = function () {
 
 QuestionView.prototype.onChoice = function (event) {
   var choice = $(event.target).parent().index();
-  console.log(choice);
+  console.log('QuestionView.prototype.onChoice: ' + choice);
   if (this.onChange) {
     this.onChange(choice);
   }
@@ -102,12 +102,14 @@ QuestionView.prototype.hideQuestions = function () {
 };
 
 QuestionView.prototype.setQuestion = function (questionObj) {
-  questionCurrentElement.text(questionObj.questionNum);
-  questionElement.text(questionObj.text);
-  answersElement.empty();
+  this.questionCurrentElement.text(questionObj.questionNum);
+  this.questionElement.text(questionObj.text);
+  this.answersElement.empty();
+  console.log('questionObj');
+  console.log(questionObj);
   for (var i = 0; i < questionObj.answers.length; i++) {
     var answer = questionObj.answers[i]; // model
-    answersElement.append('<li><button>' + answer + '</button></li>');
+    this.answersElement.append('<li><button>' + answer + '</button></li>');
   }
 };
 
@@ -127,7 +129,21 @@ ResultView.prototype.hideResults = function () {
   this.questionsPageElement.hide();
 };
 
+/*------------ CONTROLLER ------------*/
 
+var Controller = function(model, questionView, resultView) {
+  this.model = model;
+  this.questionView = questionView;
+  this.resultView = resultView;
+
+  this.questionView.onChange = this.onAnswerSubmitted.bind(this);
+};
+
+Controller.prototype.onAnswerSubmitted = function(userChoice) {
+  console.log('in Controller.prototype.onAnswerSubmitted');
+  this.model.checkQuestion(userChoice);
+  this.questionView.setQuestion(this.model.getQuestion());
+};
 
 /*
 var showResults = function () {
@@ -191,4 +207,12 @@ restartButtonElement.click(function () {
 $(document).ready(function () {
   //  questionsTotalElement.text(QUESTIONS.length); // view
   //  setQuestion(0); // mostly view
+
+  var model = new Model();
+  var questionView = new QuestionView();
+  var resultView = new ResultView();
+
+  var controller = new Controller(model, questionView, resultView);
+
+  questionView.setQuestion(model.getQuestion());
 });
