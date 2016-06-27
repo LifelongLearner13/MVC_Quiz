@@ -1,6 +1,6 @@
 /*------------ MODEL ------------*/
 
-var Model = function() {
+var Model = function () {
   this.questions = [{
     text: '<:48:x<:65:=<:6C:$=$=$$~<:03:+$~<:ffffffffffffffbd:+$<:ffffffffffffffb1:+$<:57:~$~<:18:x+$~<:03:+$~<:06:x-$x<:0e:x-$=x<:43:x-$',
     answers: [
@@ -43,12 +43,12 @@ var Model = function() {
   this.onChange = null;
 };
 
-Model.prototype.resetGame = function() {
+Model.prototype.resetGame = function () {
   this.score = 0;
   this.currentQuestion = 0;
 };
 
-Model.prototype.checkQuestion = function(input) {
+Model.prototype.checkQuestion = function (input) {
   if (input === this.questions[this.currentQuestion].correct) {
     this.score++;
   }
@@ -57,11 +57,11 @@ Model.prototype.checkQuestion = function(input) {
   }
 };
 
-Model.prototype.getScore = function() {
+Model.prototype.getScore = function () {
   console.log(this.score);
 };
 
-Model.prototype.getQuestion = function() {
+Model.prototype.getQuestion = function () {
   return {
     questionNum: currentQuestion,
     text: this.questions[this.currentQuestion].text,
@@ -73,67 +73,57 @@ var model = new Model();
 
 /*------------ VIEW ------------*/
 
-var QuestionView = function() {
+var QuestionView = function () {
   this.questionsPageElement = $('.questions-page');
   this.questionCurrentElement = $('.question-current');
   this.questionsTotalElement = $('.questions-total');
   this.questionElement = $('.question');
   this.answersElement = $('.answers');
 
-  this.answersElement.on('click', 'button', this.onChoice());
+  this.answersElement.on('click', 'button', this.onChoice.bind(this));
 
   this.onChange = null;
-  };
+};
 
-  QuestionView.prototype.onChoice = function() {
-    var choice = $(this).parent().index();
-    if (this.onChange) {
-      this.onChange(choice);
-    }
-    // var questionIndex = parseInt(questionCurrentElement.text(), 10);
-    // var question = QUESTIONS[questionIndex]; // model
-    // if (question.correct === choice) { // model
-    //   increaseScore();
-    // }
+QuestionView.prototype.onChoice = function (event) {
+  var choice = $(event.target).parent().index();
+  console.log(choice);
+  if (this.onChange) {
+    this.onChange(choice);
+  }
+};
 
-    // if (questionIndex + 1 < QUESTIONS.length) { // model
-    //   setQuestion(questionIndex + 1);
-    // } else {
-    //   showResults();
-    // }
-  };
-
-QuestionView.prototype.showQuestions = function() {
+QuestionView.prototype.showQuestions = function () {
   this.questionsPageElement.show();
 };
 
-QuestionView.prototype.hideQuestions = function() {
+QuestionView.prototype.hideQuestions = function () {
   this.questionsPageElement.hide();
 };
 
-QuestionView.prototype.setQuestion = function(questionObj) {
+QuestionView.prototype.setQuestion = function (questionObj) {
   questionCurrentElement.text(questionObj.questionNum);
   questionElement.text(questionObj.text);
   answersElement.empty();
   for (var i = 0; i < questionObj.answers.length; i++) {
     var answer = questionObj.answers[i]; // model
-    answersElement.append('<li><button id="' + i + '" type="button">' + answer + '</button></li>');
+    answersElement.append('<li><button>' + answer + '</button></li>');
   }
 };
 
 
 
-var ResultView = function() {
+var ResultView = function () {
   this.resultsPageElement = $('.results-page');
   this.scoreElement = $('.score');
   this.restartButtonElement = $('.restart-button');
 };
 
-ResultView.prototype.showResults = function() {
+ResultView.prototype.showResults = function () {
   this.questionsPageElement.show();
 };
 
-ResultView.prototype.hideResults = function() {
+ResultView.prototype.hideResults = function () {
   this.questionsPageElement.hide();
 };
 
@@ -198,7 +188,7 @@ restartButtonElement.click(function () {
 
 */
 
-$(document).ready(function() {
+$(document).ready(function () {
   //  questionsTotalElement.text(QUESTIONS.length); // view
   //  setQuestion(0); // mostly view
 });
