@@ -47,16 +47,30 @@ var Model = function () {
   this.currentQuestion = 0;
 }
 
-Model.prototype.resetScore = function () {
+Model.prototype.resetGame = function () {
   this.score = 0;
+  this.currentQuestion = 0;
 }
 
 Model.prototype.checkQuestion = function (input) {
   if (input === this.questions[this.currentQuestion].correct) {
     this.score++;
   }
-  this.currentQuestion++;
+  if (++this.currentQuestion === this.questions.length) {
+    console.log('game over');
+  }
 }
+
+Model.prototype.getScore = function () {
+  console.log(this.score);
+}
+
+Model.prototype.getQuestion = function () {
+  console.log(this.questions[this.currentQuestion].text);
+  console.log(this.questions[this.currentQuestion].answers);
+}
+
+var model = new Model();
 
 
 //var increaseScore = function () {
@@ -66,6 +80,7 @@ Model.prototype.checkQuestion = function (input) {
 
 /*------------ VIEW ------------*/
 
+/*
 var showResults = function () {
   questionsPageElement.hide();
   resultsPageElement.show();
@@ -122,7 +137,9 @@ restartButtonElement.click(function () {
   showQuestions(); // view
 });
 
+*/
+
 $(document).ready(function () {
-  questionsTotalElement.text(QUESTIONS.length); // view
-  setQuestion(0); // mostly view
+  //  questionsTotalElement.text(QUESTIONS.length); // view
+  //  setQuestion(0); // mostly view
 });
