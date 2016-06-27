@@ -1,14 +1,30 @@
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>MVC Quiz</title>
-    <link rel="stylesheet" type="text/css" href="cs/styles.css">
-  </head>
-  <body>
-    <h1>MVC Quiz</h1>
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+  <meta charset="UTF-8">
+  <title>MVC Quiz</title>
+  <link rel="stylesheet" type="text/css" href="cs/styles.css">
+</head>
 
-    <script src="js/app.js"></script>
-  </body>
-  </html>
+<body>
+  <div class="questions-page">
+    <div>
+      <span class="question-current">0</span>/<span class="questions-total">0</span>
+    </div>
+    <div class="question">
+    </div>
+    <ul class="answers">
+    </ul>
+  </div>
+  <div class="results-page" style="display: none;">
+    <div>
+      You scored <span class="score">0</span>/<span class="questions-total">0</span>
+    </div>
+    <button type="button" class="restart-button">Restart</button>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
