@@ -129,7 +129,7 @@ QuestionView.prototype.setResults = function (score) {
   this.scoreElement.text(score);
 }
 
-// TODO: find all the binds and bind them
+// TODO: [x] find all the binds and bind them
 
 
 /*------------ CONTROLLER ------------*/
