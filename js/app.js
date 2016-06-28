@@ -1,51 +1,56 @@
 /*------------ MODEL ------------*/
 
 var Model = function () {
-  this.questions = [{
-    text: 'Question 1',
-    answers: [
-      '0815',
-      '2B',
-      'BAM128',
-      'Barely'
-    ],
-    correct: 0
-  }, {
-    text: 'Question 2',
-    answers: [
-      '0815',
-      '2B',
-      'BAM128',
-      'Barely'
-    ],
-    correct: 1
-  }, {
-    text: 'Question 3',
-    answers: [
-      '0815',
-      '2B',
-      'BAM128',
-      'Barely'
-    ],
-    correct: 2
-  }, {
-    text: 'Question 4',
-    answers: [
-      '0815',
-      '2B',
-      'BAM128',
-      'Barely'
-    ],
-    correct: 3
-  }];
-  this.shuffleQuestions();
+  this.questions = [
+    {
+        text: '<:48:x<:65:=<:6C:$=$=$$~<:03:+$~<:ffffffffffffffbd:+$<:ffffffffffffffb1:+$<:57:~$~<:18:x+$~<:03:+$~<:06:x-$x<:0e:x-$=x<:43:x-$',
+        answers: [
+            '0815',
+            '2B',
+            'BAM128',
+            'Barely'
+        ],
+        correct: '0815'
+    },
+    {
+        text: '+0+0+0+0+0+0+0+2)+0+0+9)+7))+3)-0-0-0-0-0-0-0-9)+0+0+0+0+0+0+0+0+7)-8)+3)-6)-8)-7-0-0-0-0-0-0)',
+        answers: [
+            '0815',
+            '2B',
+            'BAM128',
+            'Barely'
+        ],
+        correct: '2B'
+    },
+    {
+        text: '*6*3p*4*3*2*0p*2*1*0pp>0*1*0p*5*4*0p*5*4*2*1*0p*4*3p*1*0p/+0p+0*6*5*2p+0*5*0p',
+        answers: [
+            '0815',
+            '2B',
+            'BAM128',
+            'Barely'
+        ],
+        correct: 'BAM128'
+    },
+    {
+        text: ']xhhhhooooooooohhhhhhxooooooooxooooooxjjjxhoooohhhxhohhhhhhhxhhhhjjjhhhxhhhhooooooooohhhhhhxjjjxxjjjjjjjxjhhhhxjhhhhhhhhjjjhh~',
+        answers: [
+            '0815',
+            '2B',
+            'BAM128',
+            'Barely'
+        ],
+        correct: 'Barely'
+    }
+];
+  this.shuffleQuestions(this.questions);
   this.score = 0;
   this.currentQuestion = 0;
   this.onChange = null;
 };
 
 Model.prototype.resetGame = function () {
-  this.shuffleQuestions();
+  this.shuffleQuestions(this.questions);
   this.score = 0;
   this.currentQuestion = 0;
 };
@@ -75,14 +80,22 @@ Model.prototype.getQuestion = function () {
 };
 
 Model.prototype.shuffleQuestions = function() {
-  this.questions = this.questions.sort(function() {
+  this.questions = shuffle(this.questions);
+
+  for (var q in this.questions) {
+    this.questions[q].answers = shuffle(this.questions[q].answers);
+  }
+};
+
+function shuffle(array) {
+  return array.sort(function() {
     return Math.random() - 0.5;
   });
-};
+}
 
 /*------------ VIEW ------------*/
 
-var QuestionView = function () {
+var View = function () {
   this.questionsPageElement = $('.questions-page');
   this.questionCurrentElement = $('.question-current');
   this.questionsTotalElement = $('.questions-total');
@@ -98,31 +111,31 @@ var QuestionView = function () {
   this.onReset = null;
 };
 
-QuestionView.prototype.onRestartGame = function () {
+View.prototype.onRestartGame = function () {
   if (this.onReset) {
     this.onReset();
   }
-}
+};
 
-QuestionView.prototype.onChoice = function (event) {
-  var choice = $(event.target).parent().index();
+View.prototype.onChoice = function (event) {
+  var choice = $(event.target).text();
   if (this.onChange) {
     this.onChange(choice);
   }
 };
 
-QuestionView.prototype.showQuestions = function () {
+View.prototype.showQuestions = function () {
   this.resultsPageElement.hide();
   this.questionsPageElement.show();
 };
 
-QuestionView.prototype.showResults = function () {
+View.prototype.showResults = function () {
   this.questionsPageElement.hide();
   this.resultsPageElement.show();
 };
 
 // TODO: [x] page shows 3/0, need to show the total number of questions
-QuestionView.prototype.setQuestion = function (questionObj) {
+View.prototype.setQuestion = function (questionObj) {
   this.questionCurrentElement.text(questionObj.questionNum + 1);
   this.questionElement.text(questionObj.text);
   this.answersElement.empty();
@@ -133,7 +146,7 @@ QuestionView.prototype.setQuestion = function (questionObj) {
   }
 };
 
-QuestionView.prototype.setResults = function (score) {
+View.prototype.setResults = function (score) {
   this.scoreElement.text(score);
 };
 
@@ -142,19 +155,19 @@ QuestionView.prototype.setResults = function (score) {
 
 /*------------ CONTROLLER ------------*/
 
-var Controller = function (model, questionView) {
+var Controller = function (model, view) {
   this.model = model;
-  this.questionView = questionView;
+  this.view = view;
 
-  this.questionView.questionsTotalElement.text(this.model.questions.length);
-  this.questionView.onChange = this.onAnswerSubmitted.bind(this);
-  this.questionView.onReset = this.onRestartButton.bind(this);
+  this.view.questionsTotalElement.text(this.model.questions.length);
+  this.view.onChange = this.onAnswerSubmitted.bind(this);
+  this.view.onReset = this.onRestartButton.bind(this);
   this.startGame();
 
 };
 
 Controller.prototype.startGame = function () {
-  this.questionView.setQuestion({
+  this.view.setQuestion({
     questionNum: this.model.currentQuestion,
     text: this.model.questions[this.model.currentQuestion].text,
     answers: this.model.questions[this.model.currentQuestion].answers
@@ -164,7 +177,7 @@ Controller.prototype.startGame = function () {
 Controller.prototype.onRestartButton = function () {
   this.model.resetGame();
   this.startGame();
-  this.questionView.showQuestions();
+  this.view.showQuestions();
 };
 
 Controller.prototype.onAnswerSubmitted = function (userChoice) {
@@ -173,10 +186,10 @@ Controller.prototype.onAnswerSubmitted = function (userChoice) {
 
   // TODO: [x] somehow we have to switch views...
   if (!questionObj) {
-    this.questionView.setResults(this.model.getScore());
-    this.questionView.showResults();
+    this.view.setResults(this.model.getScore());
+    this.view.showResults();
   } else {
-    this.questionView.setQuestion(questionObj);
+    this.view.setQuestion(questionObj);
   }
 };
 
@@ -186,6 +199,6 @@ Controller.prototype.onAnswerSubmitted = function (userChoice) {
 
 $(document).ready(function () {
   var model = new Model();
-  var questionView = new QuestionView();
-  var controller = new Controller(model, questionView);
+  var view = new View();
+  var controller = new Controller(model, view);
 });
