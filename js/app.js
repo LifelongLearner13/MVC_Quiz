@@ -38,12 +38,14 @@ var Model = function () {
     ],
     correct: 3
   }];
+  this.shuffleQuestions();
   this.score = 0;
   this.currentQuestion = 0;
   this.onChange = null;
 };
 
 Model.prototype.resetGame = function () {
+  this.shuffleQuestions();
   this.score = 0;
   this.currentQuestion = 0;
 };
@@ -69,7 +71,13 @@ Model.prototype.getQuestion = function () {
       text: this.questions[this.currentQuestion].text,
       answers: this.questions[this.currentQuestion].answers
     };
-  };
+  }
+};
+
+Model.prototype.shuffleQuestions = function() {
+  this.questions = this.questions.sort(function() {
+    return Math.random() - 0.5;
+  });
 };
 
 /*------------ VIEW ------------*/
@@ -127,7 +135,7 @@ QuestionView.prototype.setQuestion = function (questionObj) {
 
 QuestionView.prototype.setResults = function (score) {
   this.scoreElement.text(score);
-}
+};
 
 // TODO: [x] find all the binds and bind them
 
@@ -151,13 +159,13 @@ Controller.prototype.startGame = function () {
     text: this.model.questions[this.model.currentQuestion].text,
     answers: this.model.questions[this.model.currentQuestion].answers
   });
-}
+};
 
 Controller.prototype.onRestartButton = function () {
   this.model.resetGame();
   this.startGame();
   this.questionView.showQuestions();
-}
+};
 
 Controller.prototype.onAnswerSubmitted = function (userChoice) {
   this.model.checkQuestion(userChoice);
