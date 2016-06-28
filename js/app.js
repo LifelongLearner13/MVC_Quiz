@@ -52,22 +52,23 @@ Model.prototype.checkQuestion = function (input) {
   if (input === this.questions[this.currentQuestion].correct) {
     this.score++;
   }
-  if (++this.currentQuestion === this.questions.length) {
-    // TODO: need to handle edge case when we run out of questions - or maybe move this
-    console.log('game over');
-  }
 };
 
 Model.prototype.getScore = function () {
-  // TODO: implement how score count is displayed in view
-  console.log(this.score);
+  // TODO: [x] implement how score count is displayed in view
+  return this.score;
 };
 
 Model.prototype.getQuestion = function () {
-  return {
-    questionNum: this.currentQuestion,
-    text: this.questions[this.currentQuestion].text,
-    answers: this.questions[this.currentQuestion].answers
+  if (++this.currentQuestion === this.questions.length) {
+    // TODO: [x] need to handle edge case when we run out of questions - or maybe move this
+    return false;
+  } else {
+    return {
+      questionNum: this.currentQuestion,
+      text: this.questions[this.currentQuestion].text,
+      answers: this.questions[this.currentQuestion].answers
+    };
   };
 };
 
@@ -79,144 +80,104 @@ var QuestionView = function () {
   this.questionsTotalElement = $('.questions-total');
   this.questionElement = $('.question');
   this.answersElement = $('.answers');
+  this.resultsPageElement = $('.results-page');
+  this.scoreElement = $('.score');
+  this.restartButtonElement = $('.restart-button');
 
   this.answersElement.on('click', 'button', this.onChoice.bind(this));
-
+  this.resultsPageElement.on('click', 'button', this.onRestartGame.bind(this));
   this.onChange = null;
+  this.onReset = null;
 };
+
+QuestionView.prototype.onRestartGame = function () {
+  if (this.onReset) {
+    this.onReset();
+  }
+}
 
 QuestionView.prototype.onChoice = function (event) {
   var choice = $(event.target).parent().index();
-  console.log('QuestionView.prototype.onChoice: ' + choice);
   if (this.onChange) {
     this.onChange(choice);
   }
 };
 
 QuestionView.prototype.showQuestions = function () {
+  this.resultsPageElement.hide();
   this.questionsPageElement.show();
 };
 
-QuestionView.prototype.hideQuestions = function () {
+QuestionView.prototype.showResults = function () {
   this.questionsPageElement.hide();
+  this.resultsPageElement.show();
 };
 
-// TODO: page shows 3/0, need to show the total number of questions
+// TODO: [x] page shows 3/0, need to show the total number of questions
 QuestionView.prototype.setQuestion = function (questionObj) {
-  this.questionCurrentElement.text(questionObj.questionNum);
+  this.questionCurrentElement.text(questionObj.questionNum + 1);
   this.questionElement.text(questionObj.text);
   this.answersElement.empty();
-  console.log('questionObj');
-  console.log(questionObj);
+
   for (var i = 0; i < questionObj.answers.length; i++) {
     var answer = questionObj.answers[i]; // model
     this.answersElement.append('<li><button>' + answer + '</button></li>');
   }
 };
 
+QuestionView.prototype.setResults = function (score) {
+  this.scoreElement.text(score);
+}
+
 // TODO: find all the binds and bind them
-// TODO: somehow we have to switch views...
 
-var ResultView = function () {
-  this.resultsPageElement = $('.results-page');
-  this.scoreElement = $('.score');
-  this.restartButtonElement = $('.restart-button');
-};
-
-ResultView.prototype.showResults = function () {
-  this.questionsPageElement.show();
-};
-
-ResultView.prototype.hideResults = function () {
-  this.questionsPageElement.hide();
-};
 
 /*------------ CONTROLLER ------------*/
 
-var Controller = function (model, questionView, resultView) {
+var Controller = function (model, questionView) {
   this.model = model;
   this.questionView = questionView;
-  this.resultView = resultView;
 
+  this.questionView.questionsTotalElement.text(this.model.questions.length);
   this.questionView.onChange = this.onAnswerSubmitted.bind(this);
+  this.questionView.onReset = this.onRestartButton.bind(this);
+  this.startGame();
+
 };
+
+Controller.prototype.startGame = function () {
+  this.questionView.setQuestion({
+    questionNum: this.model.currentQuestion,
+    text: this.model.questions[this.model.currentQuestion].text,
+    answers: this.model.questions[this.model.currentQuestion].answers
+  });
+}
+
+Controller.prototype.onRestartButton = function () {
+  this.model.resetGame();
+  this.startGame();
+  this.questionView.showQuestions();
+}
 
 Controller.prototype.onAnswerSubmitted = function (userChoice) {
-  console.log('in Controller.prototype.onAnswerSubmitted');
   this.model.checkQuestion(userChoice);
-  this.questionView.setQuestion(this.model.getQuestion());
-};
+  var questionObj = this.model.getQuestion();
 
-/*
-var showResults = function () {
-  questionsPageElement.hide();
-  resultsPageElement.show();
-};
-
-var showQuestions = function () {
-  resultsPageElement.hide();
-  questionsPageElement.show();
-};
-
-//var resetScore = function () {
-//  scoreElement.text(0);
-//};
-
-var questionsPageElement = $('.questions-page');
-var questionCurrentElement = $('.question-current');
-var questionsTotalElement = $('.questions-total');
-var questionElement = $('.question');
-var answersElement = $('.answers');
-
-var resultsPageElement = $('.results-page');
-var scoreElement = $('.score');
-var restartButtonElement = $('.restart-button');
-
-var setQuestion = function (questionIndex) {
-  var question = QUESTIONS[questionIndex]; // model
-  questionCurrentElement.text(questionIndex);
-  questionElement.text(question.text);
-  answersElement.empty();
-  for (var i = 0; i < question.answers.length; i++) {
-    var answer = question.answers[i]; // model
-    answersElement.append('<li><button type="button">' + answer + '</button></li>');
-  }
-};
-
-answersElement.on('click', 'button', function () {
-  var choice = $(this).parent().index();
-  var questionIndex = parseInt(questionCurrentElement.text(), 10);
-  var question = QUESTIONS[questionIndex]; // model
-  if (question.correct === choice) { // model
-    increaseScore();
-  }
-
-  if (questionIndex + 1 < QUESTIONS.length) { // model
-    setQuestion(questionIndex + 1);
+  // TODO: [x] somehow we have to switch views...
+  if (!questionObj) {
+    this.questionView.setResults(this.model.getScore());
+    this.questionView.showResults();
   } else {
-    showResults();
+    this.questionView.setQuestion(questionObj);
   }
-});
+};
 
-restartButtonElement.click(function () {
-  setQuestion(0); // mostly view
-  resetScore(); // view
-  showQuestions(); // view
-});
+/*------------ DOC READY ------------*/
 
-*/
-
-// TODO: restart button - in the result view most likely
+// TODO: [x] restart button - in the result view most likely
 
 $(document).ready(function () {
-  //  questionsTotalElement.text(QUESTIONS.length); // view
-  //  setQuestion(0); // mostly view
-
   var model = new Model();
   var questionView = new QuestionView();
-  var resultView = new ResultView();
-
-  var controller = new Controller(model, questionView, resultView);
-
-  questionView.setQuestion(model.getQuestion());
+  var controller = new Controller(model, questionView);
 });
